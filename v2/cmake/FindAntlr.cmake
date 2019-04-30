@@ -22,7 +22,7 @@
 #    ADD_EXECUTABLE(${mygrammar_output_files} other_source.c)
 
 SET(Antlr_FOUND FALSE)
-FIND_PROGRAM(Antlr_EXECUTABLE NAMES cantlr antlr runantlr cantlr.sh)
+FIND_PROGRAM(Antlr_EXECUTABLE NAMES cantlr antlr antlr2 runantlr runantlr2 cantlr.sh)
 IF(NOT Antlr_EXECUTABLE)
     MESSAGE(STATUS "cannot find the antlr executable")
 ENDIF(NOT Antlr_EXECUTABLE)
@@ -90,6 +90,8 @@ IF(Antlr_EXECUTABLE)
             ENDIF(Antlr_ANTLR_CONFIG_EXECUTABLE)
         ENDIF(Antlr_SEARCH_CPP)
     ENDFOREACH(lang)
+ELSE()
+    message(STATUS "Antlr2 not found")
 ENDIF(Antlr_EXECUTABLE)
 
 IF (Antlr_FOUND)

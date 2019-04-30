@@ -1,18 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
-# Install llvm-2.8
-set(LLVM_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_llvm28)
-include(ExternalProject)
-ExternalProject_Add(llvm28
-    PREFIX llvm28
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm-2.8.tgz
-    PATCH_COMMAND patch
-        <SOURCE_DIR>/lib/ExecutionEngine/JIT/Intercept.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm.patch
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${LLVM_INSTALL_DIR} -Wno-dev
-        -DLLVM_TARGETS_TO_BUILD=X86;ARM
-    BUILD_COMMAND $(MAKE) -j4
-    )
+# Build llvm2.0 before anything else.
+set(LLVM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm-2.8)
+set(LLVM_INSTALL_DIR _llvm)
+configure_file(CMakeLists.txt.llvm28.in llvm28/CMakeLists.txt)
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/llvm28" )
+execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/llvm28" )
+
 
 set(LLVM_CONFIG_BIN ${LLVM_INSTALL_DIR}/bin/llvm-config)
 include_directories(${LLVM_INSTALL_DIR}/include)
@@ -59,10 +55,11 @@ include_directories(
 
 file(GLOB SRCS src/*.cpp)
 add_executable(llvm2aa ${SRCS})
+add_dependencies(llvm2aa llvm28)
+
 set_target_properties(llvm2aa PROPERTIES COMPILE_FLAGS ${LLVM_CXX_FLAGS})
 
 # Build llvm2.8 before building this target.
-add_dependencies(llvm2aa llvm28)
 
 # foreach(llvm_static_lib ${LLVM_STATIC_LIBS})
     # message(STATUS "xx ${llvm_static_lib}")

@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 2.8)
-project(ahir-v2)
-include(common.cmake)
 
 # Build dependencies.
 find_package(Boost 1.58 REQUIRED)
