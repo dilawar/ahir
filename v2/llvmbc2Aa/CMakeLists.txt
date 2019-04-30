@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # Build llvm2.0 before anything else.
 set(LLVM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm-2.8)
-set(LLVM_INSTALL_DIR _llvm)
+set(LLVM_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_llvm)
 configure_file(CMakeLists.txt.llvm28.in llvm28/CMakeLists.txt)
 execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/llvm28" )
