@@ -23,7 +23,7 @@ include_directories(
 
 file(GLOB SRCS src/*.cpp)
 add_library(HierSys SHARED ${SRCS})
-target_link_libraries(HierSys ${ANTLR_LIB})
+target_link_libraries(HierSys antlr)
 add_dependencies(HierSys parser)
 
 # These executable require libValue which is outside this project. To build
@@ -40,7 +40,7 @@ target_link_libraries(hierSysCheck HierSys parser Value)
 
 add_executable(hierSysUniquify util/hierSysUniquify.cpp)
 target_include_directories(hierSysUniquify PRIVATE src)
-target_link_libraries(hierSysUniquify HierSys Value parser ${ANTLR_LIB})
+target_link_libraries(hierSysUniquify HierSys Value parser antlr)
 
 # install
 install(

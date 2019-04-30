@@ -16,16 +16,16 @@ set_target_properties(BitVectors PROPERTIES PUBLIC_HEADER
     "${BITVECTORS_INCLUDE}")
 
 # Tests
-add_executable(test_bit_vectors util/test_bit_vectors.c)
-target_link_libraries(test_bit_vectors BitVectors
-    BitVectors
-    SockPipes
-    PipeHandler
-    ${CMAKE_THREAD_LIBS_INIT}
-    )
-
-enable_testing()
-add_test(NAME test_bit_vectors COMMAND $<TARGET_FILE:test_bit_vectors>)
+#add_executable(test_bit_vectors util/test_bit_vectors.c)
+#target_link_libraries(test_bit_vectors BitVectors
+#    BitVectors
+#    SockPipes
+#    PipeHandler
+#    ${CMAKE_THREAD_LIBS_INIT}
+#    )
+#
+#enable_testing()
+#add_test(NAME test_bit_vectors COMMAND $<TARGET_FILE:test_bit_vectors>)
 
 # install
 install(TARGETS BitVectors 
