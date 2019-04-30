@@ -105,7 +105,107 @@ public:
     // If the capacity of the array is huge, and the # elements used is small,
     // shrink the array.
     if (NumEntries * 4 < NumBuckets && NumBuckets > 64) {
-      *InsertIntoBucket(Key, ValueT(), TheBucket);
+      shrink_and_clear();
+      return;
+    }
+
+    const KeyT EmptyKey = getEmptyKey(), TombstoneKey = getTombstoneKey();
+    for (BucketT *P = Buckets, *E = Buckets+NumBuckets; P != E; ++P) {
+      if (!KeyInfoT::isEqual(P->first, EmptyKey)) {
+        if (!KeyInfoT::isEqual(P->first, TombstoneKey)) {
+          P->second.~ValueT();
+          --NumEntries;
+        }
+        P->first = EmptyKey;
+      }
+    }
+    assert(NumEntries == 0 && "Node count imbalance!");
+    NumTombstones = 0;
+  }
+
+  /// count - Return true if the specified key is in the map.
+  bool count(const KeyT &Val) const {
+    BucketT *TheBucket;
+    return LookupBucketFor(Val, TheBucket);
+  }
+
+  iterator find(const KeyT &Val) {
+    BucketT *TheBucket;
+    if (LookupBucketFor(Val, TheBucket))
+      return iterator(TheBucket, Buckets+NumBuckets);
+    return end();
+  }
+  const_iterator find(const KeyT &Val) const {
+    BucketT *TheBucket;
+    if (LookupBucketFor(Val, TheBucket))
+      return const_iterator(TheBucket, Buckets+NumBuckets);
+    return end();
+  }
+
+  /// lookup - Return the entry for the specified key, or a default
+  /// constructed value if no such entry exists.
+  ValueT lookup(const KeyT &Val) const {
+    BucketT *TheBucket;
+    if (LookupBucketFor(Val, TheBucket))
+      return TheBucket->second;
+    return ValueT();
+  }
+
+  // Inserts key,value pair into the map if the key isn't already in the map.
+  // If the key is already in the map, it returns false and doesn't update the
+  // value.
+  std::pair<iterator, bool> insert(const std::pair<KeyT, ValueT> &KV) {
+    BucketT *TheBucket;
+    if (LookupBucketFor(KV.first, TheBucket))
+      return std::make_pair(iterator(TheBucket, Buckets+NumBuckets),
+                            false); // Already in map.
+
+    // Otherwise, insert the new element.
+    TheBucket = InsertIntoBucket(KV.first, KV.second, TheBucket);
+    return std::make_pair(iterator(TheBucket, Buckets+NumBuckets),
+                          true);
+  }
+
+  /// insert - Range insertion of pairs.
+  template<typename InputIt>
+  void insert(InputIt I, InputIt E) {
+    for (; I != E; ++I)
+      insert(*I);
+  }
+
+
+  bool erase(const KeyT &Val) {
+    BucketT *TheBucket;
+    if (!LookupBucketFor(Val, TheBucket))
+      return false; // not in map.
+
+    TheBucket->second.~ValueT();
+    TheBucket->first = getTombstoneKey();
+    --NumEntries;
+    ++NumTombstones;
+    return true;
+  }
+  void erase(iterator I) {
+    BucketT *TheBucket = &*I;
+    TheBucket->second.~ValueT();
+    TheBucket->first = getTombstoneKey();
+    --NumEntries;
+    ++NumTombstones;
+  }
+
+  void swap(DenseMap& RHS) {
+    std::swap(NumBuckets, RHS.NumBuckets);
+    std::swap(Buckets, RHS.Buckets);
+    std::swap(NumEntries, RHS.NumEntries);
+    std::swap(NumTombstones, RHS.NumTombstones);
+  }
+
+  value_type& FindAndConstruct(const KeyT &Key) {
+    BucketT *TheBucket;
+    if (LookupBucketFor(Key, TheBucket))
+      return *TheBucket;
+
+    return *InsertIntoBucket(Key, ValueT(), TheBucket);
   }
 
   ValueT &operator[](const KeyT &Key) {

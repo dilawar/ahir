@@ -28,6 +28,7 @@
 #include "llvm/System/Mutex.h"
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace llvm {
 
@@ -194,8 +195,8 @@ void JITDebugRegisterer::UnregisterFunctionInternal(
   JITCodeEntry = NULL;
 
   // Free the ELF file in memory.
-  std::string &Buffer = I->second.first;
-  Buffer.clear();
+  std::string &buf = I->second.first;
+  buf.clear();
 }
 
 void JITDebugRegisterer::UnregisterFunction(const Function *F) {
