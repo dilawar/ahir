@@ -4,8 +4,8 @@ compiler:
 - gcc
 
 before_install:
-    - sudo apt-install -y gcc g++ llvm-dev pdflatex 
-    - sudo apt-install cmake 
+    - sudo apt install -y gcc g++ llvm-dev pdflatex 
+    - sudo apt install cmake 
 
 script:
     - cmake -DCMAKE_INSTALL_PREFIX=/tmp/ahirv2 .
