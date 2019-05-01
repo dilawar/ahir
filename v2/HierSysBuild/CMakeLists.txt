@@ -2,13 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 # Grammar.
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../antlr2.cmake)
-ADD_ANTLR_GRAMMAR(grammar/hierSys.g GRAMMER_OUTPUT_FILES GRAMMAR_HTML_FILES)
-# message(STATUS "Output files: ${GRAMMER_OUTPUT_FILES}")
-# message(STATUS "HTML files: ${GRAMMAR_HTML_FILES}")
-set(ANTLR_LIB ${Antlr_LIBRARIES})
-set(PARSER_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+ADD_ANTLR_GRAMMAR(${CMAKE_CURRENT_SOURCE_DIR}/grammar/hierSys.g GRAMMER_OUTPUT_FILES GRAMMAR_HTML_FILES)
+set(PARSER_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 
 # Build lexer and parser.
 add_library(parser ${GRAMMER_OUTPUT_FILES})
@@ -49,8 +45,6 @@ install(
     LIBRARY DESTINATION lib
     )
 
-install(FILES hierSysParser.html hierSysLexer.html
-    DESTINATION share/doc/ahir/
-    )
+install(FILES ${GRAMMAR_HTML_FILES} DESTINATION share/doc/ahir/)
 
 

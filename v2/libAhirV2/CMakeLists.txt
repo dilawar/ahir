@@ -15,8 +15,10 @@ ADD_ANTLR_GRAMMAR(
 
 file(GLOB LIBVC_SRC src/*.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../BGLWrap/include)
+
+# This is where grammar is generated.
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(VC SHARED ${LIBVC_SRC} ${VC_GRAMMAR_OUTPUT_FILES})
 # set_target_properties(VC PROPERTIES COMPILE_FLAGS -fPIC)
