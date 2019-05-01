@@ -6,7 +6,6 @@ include_directories( ${Boost_INCLUDE_DIR})
 
 add_subdirectory(Value)
 add_subdirectory(iolib)
-add_subdirectory(llvmbc2Aa)
 add_subdirectory(libAhirV2)
 add_subdirectory(Ahir-asm/devel)
 
@@ -20,6 +19,19 @@ add_subdirectory(rtl2AaMatcher)
 # Following two only have headers.
 add_subdirectory(pthreadUtils)
 add_subdirectory(GnuPthUtils)
+
+# This is tricky. We need to build llvm2.8 first before we can build llvmbc2Aa
+add_subdirectory(external)
+
+# add_subdirectory(llvmbc2Aa)
+set(LLVMBC2AA_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llvmbc2Aa)
+set(LLVMBC2AA_BIN ${LLVMBC2AA_SOURCE_DIR}/llvm2aa)
+add_custom_command(OUTPUT ${LLVMBC2AA_BIN}
+    COMMAND ${CMAKE_COMMAND} ${LLVMBC2AA_SOURCE_DIR}
+    COMMAND $(MAKE)
+    WORKING_DIRECTORY ${LLVMBC2AA_SOURCE_DIR} 
+    )
+add_custom_target(llvm2a_tgt ALL DEPENDS ${LLVMBC2AA_BIN})
 
 install(PROGRAMS 
     ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/ghdlSanitize.sh 

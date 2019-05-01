@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Build llvm2.0 before anything else.
-set(LLVM_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/llvm-2.8)
-set(LLVM_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/_llvm)
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.llvm28.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/llvm28/CMakeLists.txt
-    )
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/llvm28" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/llvm28" )
-
+set(LLVM_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../external/_llvm28_install)
 
 set(LLVM_CONFIG_BIN ${LLVM_INSTALL_DIR}/bin/llvm-config)
+
+if(NOT EXISTS ${LLVM_CONFIG_BIN})
+    message(FATAL_ERROR "Install llvm2.8 first"
+        "Run cmake in ./external/ directory"
+        )
+endif()
+
 include_directories(${LLVM_INSTALL_DIR}/include)
 
 execute_process(COMMAND
@@ -29,7 +25,6 @@ execute_process(COMMAND
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 separate_arguments(LLVM_STATIC_LIBS)
-
 message(STATUS "llvm compiler flags: ${LLVM_CXX_FLAGS}")
 message(STATUS "llvm libraries to link:")
 foreach(_llvm_lib ${LLVM_STATIC_LIBS})
@@ -59,15 +54,7 @@ include_directories(
 
 file(GLOB SRCS src/*.cpp)
 add_executable(llvm2aa ${SRCS})
-add_dependencies(llvm2aa llvm28)
-
 set_target_properties(llvm2aa PROPERTIES COMPILE_FLAGS ${LLVM_CXX_FLAGS})
-
-# Build llvm2.8 before building this target.
-
-# foreach(llvm_static_lib ${LLVM_STATIC_LIBS})
-    # message(STATUS "xx ${llvm_static_lib}")
-# endforeach()
 target_link_libraries(llvm2aa ${LLVM_STATIC_LIBS})
 target_link_libraries(llvm2aa ${CMAKE_THREAD_LIBS_INIT})
 
